@@ -51,8 +51,12 @@ jobs:
           extensions: mbstring, dom, fileinfo, sqlite, pdo_sqlite
           coverage: none
 
-      - name: Resolve PHP dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Normalize PHP 8.3 dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          composer config platform.php 8.3.0
+          composer update --no-interaction --prefer-dist --no-progress
 
       - name: Prepare Laravel
         shell: bash
