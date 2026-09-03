@@ -1,10 +1,10 @@
-name: Bootstrap source
+name: Validate recovered source
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - repair-source-bundle
 
 permissions:
   contents: write
@@ -17,11 +17,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore audited source
+      - name: Restore recovered source
         shell: bash
         run: |
           set -euo pipefail
-          cat .bootstrap/part-* | base64 --decode > /tmp/that-car-app.tar.xz
+          cat \
+            .bootstrap/part-00 \
+            .bootstrap/part-01 \
+            .bootstrap/part-02 \
+            .bootstrap/fix-03-0 \
+            .bootstrap/fix-03-1 \
+            .bootstrap/fix-03-2 \
+            .bootstrap/part-04 \
+            .bootstrap/part-05 \
+            .bootstrap/part-06 \
+            .bootstrap/part-07 \
+            .bootstrap/fix-08-0 \
+            .bootstrap/fix-08-1 \
+            .bootstrap/fix-08-2 \
+            .bootstrap/fix-09-0 \
+            .bootstrap/fix-09-1 \
+            .bootstrap/fix-09-2 \
+            | base64 --decode > /tmp/that-car-app.tar.xz
           xz -t /tmp/that-car-app.tar.xz
           tar -tJf /tmp/that-car-app.tar.xz > /dev/null
           tar -xJf /tmp/that-car-app.tar.xz -C .
@@ -60,23 +77,21 @@ jobs:
           node-version: '22'
 
       - name: Build frontend
-        shell: bash
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Validate containers
-        shell: bash
         run: |
           docker compose config --quiet
           docker compose build
 
-      - name: Publish audited source
+      - name: Publish validated source branch
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Build production-ready That Car App"
-          git push origin HEAD:main
+          git commit -m "Publish validated That Car App source"
+          git push --force origin HEAD:source-ready
