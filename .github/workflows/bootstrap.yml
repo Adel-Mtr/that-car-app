@@ -66,12 +66,17 @@ jobs:
           touch database/database.sqlite
           php artisan migrate:fresh --seed --force
 
-      - name: Run PHP tests and formatting checks
-        shell: bash
+      - name: Run PHPUnit
+        run: php artisan test --compact
+
+      - name: Check PHP formatting
+        run: vendor/bin/pint --test
+
+      - name: Validate routes
+        run: php artisan route:list --except-vendor > /dev/null
+
+      - name: Validate Blade views
         run: |
-          php artisan test
-          vendor/bin/pint --test
-          php artisan route:list > /dev/null
           php artisan view:cache
           php artisan view:clear
 
@@ -82,7 +87,7 @@ jobs:
 
       - name: Build frontend
         run: |
-          npm ci
+          npm ci --no-audit --no-fund
           npm run build
 
       - name: Validate containers
