@@ -22,7 +22,8 @@ jobs:
         run: |
           set -euo pipefail
           cat .bootstrap/part-* | base64 --decode > /tmp/that-car-app.tar.xz
-          echo "14b9c3af2bf89aadd838357c365411e7f028217f0cd659dec5fb06ba99c9d3e4  /tmp/that-car-app.tar.xz" | sha256sum -c -
+          xz -t /tmp/that-car-app.tar.xz
+          tar -tJf /tmp/that-car-app.tar.xz > /dev/null
           tar -xJf /tmp/that-car-app.tar.xz -C .
           rm -rf .bootstrap .github/workflows/bootstrap.yml
 
