@@ -1,0 +1,79 @@
+name: Bootstrap source
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore audited source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/part-* | base64 --decode > /tmp/that-car-app.tar.xz
+          echo "a5c72923ccac2b989bb4e63336ec8cdf3a87ab52bdc25f5233f68717a4bbb5aa  /tmp/that-car-app.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/that-car-app.tar.xz -C .
+          rm -rf .bootstrap .github/workflows/bootstrap.yml
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, fileinfo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare Laravel
+        shell: bash
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+          php artisan migrate:fresh --seed --force
+
+      - name: Run PHP tests and formatting checks
+        shell: bash
+        run: |
+          php artisan test
+          vendor/bin/pint --test
+          php artisan route:list > /dev/null
+          php artisan view:cache
+          php artisan view:clear
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build frontend
+        shell: bash
+        run: |
+          npm ci
+          npm run build
+
+      - name: Validate containers
+        shell: bash
+        run: |
+          docker compose config --quiet
+          docker compose build
+
+      - name: Publish audited source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Build production-ready That Car App"
+          git push origin HEAD:main
