@@ -44,6 +44,13 @@ jobs:
           tar -xJf /tmp/that-car-app.tar.xz -C .
           rm -rf .bootstrap .github/workflows/bootstrap.yml
 
+          # Laravel requires these writable runtime paths after a fresh clone.
+          # Track the directories with .gitignore sentinels so they survive Git.
+          mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views
+          printf '*\n!.gitignore\n' > storage/framework/cache/data/.gitignore
+          printf '*\n!.gitignore\n' > storage/framework/sessions/.gitignore
+          printf '*\n!.gitignore\n' > storage/framework/views/.gitignore
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
