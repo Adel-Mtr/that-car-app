@@ -45,11 +45,37 @@ jobs:
           rm -rf .bootstrap .github/workflows/bootstrap.yml
 
           # Laravel requires these writable runtime paths after a fresh clone.
-          # Track the directories with .gitignore sentinels so they survive Git.
           mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views
           printf '*\n!.gitignore\n' > storage/framework/cache/data/.gitignore
           printf '*\n!.gitignore\n' > storage/framework/sessions/.gitignore
           printf '*\n!.gitignore\n' > storage/framework/views/.gitignore
+
+          # The Tailwind v4 build scans Blade and Laravel pagination sources.
+          # Give the Docker frontend stage the complete allowed source context
+          # plus Composer vendor files instead of a partial resources-only copy.
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('Dockerfile')
+          text = path.read_text()
+          old = '''FROM node:22-bookworm-slim AS frontend
+          WORKDIR /app
+          COPY package.json package-lock.json ./
+          RUN npm ci --no-audit --no-fund
+          COPY resources resources
+          COPY vite.config.js ./
+          RUN npm run build'''
+          new = '''FROM node:22-bookworm-slim AS frontend
+          WORKDIR /app
+          COPY package.json package-lock.json ./
+          RUN npm ci --no-audit --no-fund
+          COPY . .
+          COPY --from=php-deps /app/vendor ./vendor
+          RUN npm run build'''
+          if old not in text:
+              raise SystemExit('Expected Docker frontend stage not found')
+          path.write_text(text.replace(old, new))
+          PY
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
