@@ -50,9 +50,8 @@ jobs:
           printf '*\n!.gitignore\n' > storage/framework/sessions/.gitignore
           printf '*\n!.gitignore\n' > storage/framework/views/.gitignore
 
-          # Tailwind v4 scans both application Blade files and Laravel pagination
-          # templates. Use the complete Docker context and Composer vendor tree in
-          # the frontend stage so every declared source is present during Vite.
+          # Tailwind v4 scans both application Blade files and framework views.
+          # Build the frontend with the complete project context and vendor tree.
           python3 - <<'PY'
           from pathlib import Path
 
@@ -127,10 +126,20 @@ jobs:
           php artisan view:cache
           php artisan view:clear
 
-      - name: Validate containers
-        run: |
-          docker compose config --quiet
-          docker compose build
+      - name: Validate Compose config
+        run: docker compose config --quiet
+
+      - name: Build Docker PHP dependencies stage
+        run: docker build --target php-dependencies --progress=plain .
+
+      - name: Build Docker frontend assets stage
+        run: docker build --target frontend-assets --progress=plain .
+
+      - name: Build Docker runtime stage
+        run: docker build --target runtime --progress=plain -t that-car-app:ci .
+
+      - name: Validate Compose build
+        run: docker compose build --progress=plain
 
       - name: Publish validated source branch
         shell: bash
