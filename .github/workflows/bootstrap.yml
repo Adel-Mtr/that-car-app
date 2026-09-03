@@ -129,6 +129,9 @@ jobs:
       - name: Validate Compose config
         run: docker compose config --quiet
 
+      - name: Build Docker PHP base stage
+        run: docker build --target php-base --progress=plain .
+
       - name: Build Docker PHP dependencies stage
         run: docker build --target php-dependencies --progress=plain .
 
