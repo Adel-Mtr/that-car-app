@@ -73,6 +73,16 @@ jobs:
           touch database/database.sqlite
           php artisan migrate:fresh --seed --force
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
       - name: Run PHPUnit
         run: php artisan test --compact
 
@@ -86,16 +96,6 @@ jobs:
         run: |
           php artisan view:cache
           php artisan view:clear
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Build frontend
-        run: |
-          npm ci --no-audit --no-fund
-          npm run build
 
       - name: Validate containers
         run: |
