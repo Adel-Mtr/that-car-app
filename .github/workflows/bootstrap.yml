@@ -19,7 +19,7 @@ jobs:
         run: |
           set -euo pipefail
           cat .bootstrap/part-* | base64 --decode > /tmp/that-car-app.tar.xz
-          echo "a5c72923ccac2b989bb4e63336ec8cdf3a87ab52bdc25f5233f68717a4bbb5aa  /tmp/that-car-app.tar.xz" | sha256sum -c -
+          echo "14b9c3af2bf89aadd838357c365411e7f028217f0cd659dec5fb06ba99c9d3e4  /tmp/that-car-app.tar.xz" | sha256sum -c -
           tar -xJf /tmp/that-car-app.tar.xz -C .
           rm -rf .bootstrap .github/workflows/bootstrap.yml
 
@@ -30,7 +30,7 @@ jobs:
           extensions: mbstring, dom, fileinfo, sqlite, pdo_sqlite
           coverage: none
 
-      - name: Install PHP dependencies
+      - name: Resolve PHP dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Prepare Laravel
@@ -54,12 +54,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
 
       - name: Build frontend
         shell: bash
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Validate containers
