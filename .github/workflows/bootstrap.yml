@@ -50,30 +50,34 @@ jobs:
           printf '*\n!.gitignore\n' > storage/framework/sessions/.gitignore
           printf '*\n!.gitignore\n' > storage/framework/views/.gitignore
 
-          # The Tailwind v4 build scans Blade and Laravel pagination sources.
-          # Give the Docker frontend stage the complete allowed source context
-          # plus Composer vendor files instead of a partial resources-only copy.
+          # Tailwind v4 scans both application Blade files and Laravel pagination
+          # templates. Use the complete Docker context and Composer vendor tree in
+          # the frontend stage so every declared source is present during Vite.
           python3 - <<'PY'
           from pathlib import Path
 
           path = Path('Dockerfile')
           text = path.read_text()
-          old = '''FROM node:22-bookworm-slim AS frontend
+          old = '''FROM node:22-bookworm-slim AS frontend-assets
           WORKDIR /app
           COPY package.json package-lock.json ./
           RUN npm ci --no-audit --no-fund
-          COPY resources resources
           COPY vite.config.js ./
+          COPY resources ./resources
+          RUN mkdir -p public storage/framework/views vendor/laravel/framework/src/Illuminate/Pagination/resources/views
+          COPY --from=php-dependencies /app/vendor/laravel/framework/src/Illuminate/Pagination/resources/views ./vendor/laravel/framework/src/Illuminate/Pagination/resources/views
           RUN npm run build'''
-          new = '''FROM node:22-bookworm-slim AS frontend
+          new = '''FROM node:22-bookworm-slim AS frontend-assets
           WORKDIR /app
           COPY package.json package-lock.json ./
           RUN npm ci --no-audit --no-fund
           COPY . .
-          COPY --from=php-deps /app/vendor ./vendor
+          COPY --from=php-dependencies /app/vendor ./vendor
+          RUN mkdir -p public storage/framework/views
+          RUN test -f resources/views/auth/reset-password.blade.php
           RUN npm run build'''
           if old not in text:
-              raise SystemExit('Expected Docker frontend stage not found')
+              raise SystemExit('Expected Docker frontend-assets stage not found')
           path.write_text(text.replace(old, new))
           PY
 
