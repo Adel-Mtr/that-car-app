@@ -26,6 +26,12 @@ jobs:
       - run: php artisan key:generate
       - run: touch database/database.sqlite
       - run: php artisan migrate:fresh --seed --force
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
       - run: php artisan test --compact
       - run: php artisan route:list --except-vendor > /dev/null
       - run: php artisan view:cache
