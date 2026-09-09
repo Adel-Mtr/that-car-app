@@ -1,0 +1,43 @@
+{
+    "name": "That Car App",
+    "short_name": "That Car App",
+    "id": "/app",
+    "description": "Your car's health, history and community.",
+    "start_url": "/app",
+    "scope": "/",
+    "lang": "en-GB",
+    "dir": "ltr",
+    "display": "standalone",
+    "background_color": "#f3f3ee",
+    "theme_color": "#101512",
+    "orientation": "portrait-primary",
+    "categories": ["automotive", "lifestyle", "utilities"],
+    "icons": [
+        {
+            "src": "/icons/app-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/app-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "My garage",
+            "short_name": "Garage",
+            "url": "/vehicles",
+            "icons": [{"src": "/icons/app-icon-192.png", "sizes": "192x192"}]
+        },
+        {
+            "name": "Add a car",
+            "short_name": "Add car",
+            "url": "/vehicles/create",
+            "icons": [{"src": "/icons/app-icon-192.png", "sizes": "192x192"}]
+        }
+    ]
+}

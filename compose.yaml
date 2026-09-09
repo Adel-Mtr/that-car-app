@@ -1,0 +1,68 @@
+x-app-environment: &app-environment
+  APP_ENV: local
+  APP_DEBUG: "false"
+  APP_URL: http://localhost:8000
+  LOG_CHANNEL: stderr
+  LOG_LEVEL: info
+  DB_CONNECTION: sqlite
+  DB_DATABASE: /data/database.sqlite
+  SESSION_DRIVER: database
+  CACHE_STORE: database
+  QUEUE_CONNECTION: database
+  FILESYSTEM_DISK: local
+  MAIL_MAILER: log
+  MAIL_FROM_ADDRESS: hello@thatcarapp.test
+  MAIL_FROM_NAME: That Car App
+  VEHICLE_DATA_DRIVER: demo
+
+x-app-volumes: &app-volumes
+  - that-car-data:/data
+  - that-car-storage:/app/storage/app
+
+services:
+  app:
+    image: that-car-app:local
+    build:
+      context: .
+    environment:
+      <<: *app-environment
+      RUN_MIGRATIONS: "true"
+      SEED_DEMO: "true"
+    ports:
+      - "8000:8000"
+    volumes: *app-volumes
+    healthcheck:
+      test: ["CMD", "php", "-r", "$$body=@file_get_contents('http://127.0.0.1:8000/up'); exit($$body === false ? 1 : 0);"]
+      interval: 10s
+      timeout: 5s
+      start_period: 25s
+      retries: 5
+    restart: unless-stopped
+
+  queue:
+    image: that-car-app:local
+    environment:
+      <<: *app-environment
+      RUN_MIGRATIONS: "false"
+    command: ["php", "artisan", "queue:work", "--sleep=1", "--tries=3", "--timeout=90"]
+    volumes: *app-volumes
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    image: that-car-app:local
+    environment:
+      <<: *app-environment
+      RUN_MIGRATIONS: "false"
+    command: ["php", "artisan", "schedule:work"]
+    volumes: *app-volumes
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  that-car-data:
+  that-car-storage:

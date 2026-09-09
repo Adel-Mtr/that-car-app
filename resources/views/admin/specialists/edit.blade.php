@@ -1,0 +1,2 @@
+@extends('layouts.app', ['title' => 'Edit specialist', 'header' => 'Administration · Specialists'])
+@section('content')<div class="mx-auto max-w-4xl"><a href="{{ route('admin.specialists.index') }}" class="text-sm font-semibold text-ink-700/55">← Specialists</a><div class="mt-5 rounded-[2rem] border border-ink-950/8 bg-paper p-7 shadow-card sm:p-10"><h1 class="text-3xl font-semibold tracking-[-0.04em]">Edit {{ $specialist->name }}</h1><div class="mt-7">@include('admin.specialists._form')</div></div></div>@endsection
