@@ -14,6 +14,23 @@ The application works out of the box with deterministic demo vehicle data. It al
 
 > This is an independent portfolio project. It is not affiliated with or endorsed by DVLA, DVSA or any vehicle manufacturer.
 
+## 60-second technical tour
+
+1. **Trace vehicle creation:** [`CreateVehicle`](app/Actions/Vehicles/CreateVehicle.php) coordinates vehicle data, MOT records, reminders and health scoring inside a database transaction.
+2. **Inspect access control:** [`VehiclePolicy`](app/Policies/VehiclePolicy.php) and [related policies](app/Policies) enforce owner/manager/viewer permissions at the resource boundary.
+3. **Check privacy:** [`VehicleDocumentController`](app/Http/Controllers/VehicleDocumentController.php) authorises downloads; [`PublicGarageController`](app/Http/Controllers/PublicGarageController.php) exposes a curated public view.
+4. **Review test evidence:** [feature tests](tests/Feature) cover user-facing workflows and cross-user isolation; [unit tests](tests/Unit) cover health scoring and vehicle-provider behaviour.
+
+### Engineering decisions
+
+- **Server-rendered monolith:** Blade and Laravel fit relational, form-driven workflows without a separate SPA/API deployment.
+- **Replaceable vehicle provider:** a contract separates deterministic demo data from credential-backed government integrations.
+- **Explainable health scoring:** rules return reasons alongside a score; this is a demo prioritisation aid, not a vehicle safety assessment.
+- **Queued reminders:** background notifications and scheduling run separately from web requests.
+- **Reproducible local evaluation:** committed lockfiles, seed data and container smoke checks make setup failures visible in CI.
+
+The documented demo runs locally. No hosted demo is linked yet; public production deployment requires separate security and operational configuration.
+
 ## Product highlights
 
 - **Vehicle garage** — add vehicles by registration and maintain mileage, insurance and visibility settings.
