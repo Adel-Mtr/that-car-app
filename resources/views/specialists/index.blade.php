@@ -1,0 +1,9 @@
+@extends('layouts.app', ['title' => 'Specialists', 'header' => 'Specialists'])
+
+@section('content')
+<div class="mx-auto max-w-[92rem]">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p class="text-sm font-medium text-moss-600">Verified expertise</p><h1 class="mt-1 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">The right hands for the work.</h1><p class="mt-3 max-w-2xl text-sm leading-6 text-ink-700/60">Discover relevant specialists, request work and bring the verified completion record back into your car’s history.</p></div><form method="GET" class="flex flex-col gap-2 sm:flex-row"><select name="category" class="rounded-full border border-ink-950/10 bg-paper px-4 py-3 text-sm shadow-sm"><option value="">All services</option>@foreach(['servicing','tyres','bodywork','detailing','performance','electric','classic'] as $category)<option value="{{ $category }}" @selected(($filters['category'] ?? '') === $category)>{{ str($category)->headline() }}</option>@endforeach</select><input name="city" value="{{ $filters['city'] ?? '' }}" placeholder="City" class="rounded-full border border-ink-950/10 bg-paper px-4 py-3 text-sm shadow-sm"><button class="rounded-full bg-ink-950 px-5 py-3 text-sm font-semibold text-white">Search</button></form></div>
+    <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">@forelse($specialists as $specialist)<x-specialist-card :specialist="$specialist" />@empty<div class="col-span-full rounded-card border border-dashed border-ink-950/15 bg-paper p-12 text-center"><span class="mx-auto grid size-12 place-items-center rounded-2xl bg-canvas"><x-icon name="wrench" /></span><h2 class="mt-4 text-lg font-semibold">No specialists match those filters.</h2><a href="{{ route('specialists.index') }}" class="mt-2 inline-flex text-sm font-semibold text-moss-600">Clear filters</a></div>@endforelse</div>
+    <div class="mt-8">{{ $specialists->links() }}</div>
+</div>
+@endsection

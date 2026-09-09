@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+
+@theme {
+    --font-sans: 'Avenir Next', 'Segoe UI', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-ink-950: #101512;
+    --color-ink-900: #18201b;
+    --color-ink-800: #243029;
+    --color-ink-700: #344139;
+    --color-moss-700: #255c46;
+    --color-moss-600: #2e7256;
+    --color-moss-100: #dcece4;
+    --color-lime-400: #d6fa70;
+    --color-lime-300: #e4ff9d;
+    --color-canvas: #f3f3ee;
+    --color-paper: #fbfbf8;
+    --color-sand-100: #e9e8df;
+    --color-amber-100: #fff0c7;
+    --color-amber-700: #8b5200;
+    --color-rose-100: #ffe2df;
+    --color-rose-700: #a22e2a;
+    --shadow-card: 0 1px 2px rgb(16 21 18 / 0.04), 0 14px 36px rgb(16 21 18 / 0.06);
+    --shadow-lift: 0 18px 50px rgb(16 21 18 / 0.15);
+    --radius-card: 1.5rem;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        min-height: 100vh;
+        background: var(--color-canvas);
+        color: var(--color-ink-950);
+        font-feature-settings: 'ss01' 1, 'cv05' 1;
+        text-rendering: optimizeLegibility;
+    }
+
+    button,
+    a,
+    input,
+    select,
+    textarea {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--color-moss-600) 45%, transparent);
+        outline-offset: 2px;
+    }
+
+    dialog::backdrop {
+        background: rgb(16 21 18 / 0.64);
+        backdrop-filter: blur(5px);
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .scrollbar-none {
+        scrollbar-width: none;
+    }
+
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+
+    .plate {
+        box-shadow: inset 0 0 0 1px rgb(16 21 18 / 0.08);
+        letter-spacing: 0.12em;
+    }
+}

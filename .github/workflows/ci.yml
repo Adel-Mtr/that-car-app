@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, dom, mbstring, pdo_sqlite, sqlite3, xml, xmlwriter
+          coverage: none
+      - run: composer validate --strict
+      - uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - run: touch database/database.sqlite
+      - run: php artisan migrate:fresh --seed --force
+      - run: php artisan test --compact
+      - run: php artisan route:list --except-vendor > /dev/null
+      - run: php artisan view:cache
+      - run: vendor/bin/pint --test
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, dom, mbstring, pdo_sqlite, sqlite3, xml, xmlwriter
+          coverage: none
+      - uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+
+  containers:
+    runs-on: ubuntu-latest
+    needs: [php, frontend]
+    steps:
+      - uses: actions/checkout@v6
+      - run: docker compose config --quiet
+      - run: docker compose build
+      - name: Smoke-test seeded demo
+        run: |
+          docker compose up -d --wait --wait-timeout 120
+          curl --fail http://localhost:8000/up
+          curl --fail http://localhost:8000/login
+          docker compose exec -T app php artisan route:list --except-vendor
+      - name: Show container logs
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop test containers
+        if: always()
+        run: docker compose down -v

@@ -2,353 +2,244 @@
 
 [![CI](https://github.com/Adel-Mtr/that-car-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Adel-Mtr/that-car-app/actions/workflows/ci.yml)
 ![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
-![PHP 8.3](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
+![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
-**A full-stack car ownership platform for keeping a garage, maintenance history, MOT records, reminders, documents, community activity and specialist bookings in one place.**
+**A vehicle-ownership companion that turns maintenance, MOT history, legal dates, documents and community activity into one useful garage.**
 
-That Car App is a Laravel application built around the practical workflows of owning and maintaining vehicles. It combines private vehicle records with optional public garage sharing, community features and a lightweight specialist-booking marketplace.
+That Car App is a server-rendered Laravel application designed around the day-to-day reality of owning a car. It combines vehicle health planning, maintenance history, reminders, private documents, shared garages, public vehicle passports, events, specialist discovery and booking in one product.
 
-> Portfolio/demo project. Vehicle/MOT information may be enriched through the UK DVSA APIs when valid credentials are supplied. The included demo mode does not require external API credentials.
+The application works out of the box with deterministic demo vehicle data. It also contains a production-oriented provider for UK DVLA Vehicle Enquiry and DVSA MOT-history integrations when credentials are supplied.
 
-## What it does
+> This is an independent portfolio project. It is not affiliated with or endorsed by DVLA, DVSA or any vehicle manufacturer.
 
-### Garage and vehicle records
+## Product highlights
 
-- Create and manage multiple vehicles.
-- Track mileage, purchase details, specifications and notes.
-- Upload vehicle images.
-- Maintain service and repair history with costs, mileage and workshop details.
-- Store private documents such as invoices, insurance files and receipts.
-- Record modifications and ownership milestones.
-- Share individual vehicles with another registered user as a viewer or manager.
-
-### MOT and ownership intelligence
-
-- Store MOT history against a vehicle.
-- Optionally fetch live vehicle/MOT information through DVSA APIs.
-- Calculate useful dashboard signals from maintenance, MOT and reminder data.
-- Keep registration-sensitive and uploaded document data out of public garage views.
-
-### Reminders
-
-- Create date- and/or mileage-based reminders.
-- Support one-off, monthly, quarterly and yearly recurrence.
-- Queue reminder notifications using Laravel's queue system.
-- Run due-reminder checks from the Laravel scheduler.
-
-### Community and public garage
-
-- Publish a public garage profile and selectively expose vehicles.
-- Create community posts attached to vehicles.
-- Like, comment on and report posts.
-- Follow other members.
-- Browse public member garages without exposing private vehicle records or files.
-
-### Events and specialists
-
-- Browse automotive events.
-- Save events to a personal list.
-- Browse verified/featured specialists.
-- Send booking requests linked to a vehicle.
-- Administrators can create and publish events, manage specialist listings and move bookings through quote, confirmation, completion and cancellation states.
-
-### Administration
-
-- Member administration and role management.
-- Content-report moderation.
-- MOT API configuration/health checks.
-- Event publishing and editing.
-- Specialist verification/featured status.
-- Booking review, quoting and lifecycle management.
-
----
-
-## Technology
-
-| Area | Stack |
-| --- | --- |
-| Application | Laravel 13, PHP 8.3+ |
-| UI | Blade, Tailwind CSS 4, Alpine.js |
-| Frontend build | Vite 7 |
-| Database | SQLite by default; Laravel-supported SQL databases can be configured |
-| Auth | Laravel authentication + authorization policies |
-| Background work | Laravel queues + scheduler |
-| Testing | PHPUnit / Laravel feature tests |
-| Code style | Laravel Pint |
-| Local packaging | Docker Compose |
-| CI | GitHub Actions |
-
----
+- **Vehicle garage** — add vehicles by registration and maintain mileage, insurance and visibility settings.
+- **Vehicle health score** — prioritises expired/approaching MOT, tax, insurance, overdue work and unresolved MOT defects.
+- **MOT history** — stores test history and turns advisories into actionable maintenance records.
+- **Maintenance timeline** — planned and completed work, mileage, provider and precise cost history.
+- **Smart reminders** — lead-time notifications with monthly, quarterly and yearly recurrence.
+- **Private document vault** — invoices, MOT files, insurance and receipts stored outside the public web root.
+- **Shared garages** — owners can grant viewer or manager access with policy-backed permissions.
+- **Public vehicle passport** — share selected vehicle history without exposing registration numbers or private files.
+- **Events** — discover meets, shows, drives and track events and register attendance with a managed vehicle.
+- **Specialists and bookings** — browse automotive specialists and request work for vehicles you manage.
+- **Community feed** — publish vehicle updates and build/drive posts.
+- **Notifications** — queued database/email reminders and vehicle-sharing notifications.
+- **Admin operations** — role-gated management for booking status/quotes, events and specialist listings.
+- **PWA shell** — installable manifest, application icons and offline navigation fallback.
 
 ## Quick start with Docker
 
-Docker is the easiest way to run the complete demo application.
+The Docker setup is the easiest way to run the complete application. It starts the web application, database-backed queue worker and Laravel scheduler, creates the SQLite database, runs migrations and seeds demo content automatically.
 
 ### Requirements
 
-- Docker with Docker Compose
+- Docker Engine / Docker Desktop
+- Docker Compose v2
 
 ```bash
-git clone https://github.com/Adel-Mtr/that-car-app.git
+git clone --depth 1 https://github.com/Adel-Mtr/that-car-app.git
 cd that-car-app
 docker compose up --build
 ```
 
-The first startup automatically:
+Open **http://localhost:8000**.
 
-1. creates a local environment file inside the container;
-2. generates an application key when required;
-3. creates the SQLite database;
-4. runs migrations;
-5. seeds portfolio-safe demo data;
-6. starts the web application, queue worker and scheduler.
+### Demo account
 
-Open:
+```text
+Email:    demo@thatcarapp.test
+Password: password
+```
 
-- App: **http://localhost:8000**
-- Health check: **http://localhost:8000/up**
+Admin demo:
 
-### Demo accounts
+```text
+Email:    admin@thatcarapp.test
+Password: password
+```
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Member | `demo@thatcar.app` | `password` |
-| Administrator | `admin@thatcar.app` | `password` |
+These credentials only belong to seeded local demo data and must not be reused in a real deployment.
 
-These credentials are generated by the demo seeder and are intended **only for local/demo use**.
+If you register a new account in the Docker demo, email is intentionally sent to Laravel's log mailer. The queued verification message (including its local verification link) can be inspected with:
 
-Stop the stack with:
+```bash
+docker compose logs -f queue
+```
+
+Stop the application with:
 
 ```bash
 docker compose down
 ```
 
-Remove the demo database and private-document volume as well:
+Reset the demo database and uploaded demo files:
 
 ```bash
 docker compose down -v
+docker compose up --build
 ```
 
----
-
-## Local development without Docker
+## Local development
 
 ### Requirements
 
-- PHP 8.3+
+- PHP 8.4.1+ (required by the committed dependency lockfile)
 - Composer 2
 - Node.js 22+
-- npm
-- PHP extensions expected by Laravel/PHPUnit, including SQLite support for the default setup
+- SQLite with the PHP PDO SQLite extension
+- PHP extensions required by Laravel/PHPUnit, including `mbstring`, `dom`, `xml` and `xmlwriter`
 
-### Install
+### Setup
 
 ```bash
-git clone https://github.com/Adel-Mtr/that-car-app.git
-cd that-car-app
 composer install
-npm ci
 cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
 php artisan migrate --seed
+npm ci
 npm run build
 ```
 
-Run the application:
+Start the Laravel development environment:
 
 ```bash
-php artisan serve
+composer dev
 ```
 
-For active frontend development, run Vite in another terminal:
+Or use the Makefile:
 
 ```bash
-npm run dev
+make setup
+make demo
+make dev
 ```
 
-To process queued notifications:
+## Vehicle data providers
 
-```bash
-php artisan queue:work
-```
+### Demo provider — default
 
-To run the scheduler locally in development:
-
-```bash
-php artisan schedule:work
-```
-
----
-
-## Tests and validation
-
-```bash
-composer test
-```
-
-The suite covers authentication, vehicle authorization, cross-user access, vehicle sharing, maintenance records, reminders, private documents, MOT records, community interactions, bookings and admin controls.
-
-Format PHP:
-
-```bash
-./vendor/bin/pint
-```
-
-Build the frontend:
-
-```bash
-npm run build
-```
-
-GitHub Actions runs the backend test suite, Laravel Pint, route/Blade validation, a production Vite build and the Docker image build.
-
----
-
-## DVSA integration
-
-The app can enrich vehicle data using DVSA services when credentials are configured.
-
-The demo setup intentionally leaves these values blank. Add your own credentials to a local `.env` only:
+No external credentials are required. `DemoVehicleDataProvider` derives stable sample vehicle/MOT data from the registration, making the app straightforward to evaluate, test and develop offline after dependencies are installed.
 
 ```env
-DVSA_CLIENT_ID=
-DVSA_CLIENT_SECRET=
-DVSA_API_KEY=
-DVSA_TOKEN_URL=https://login.microsoftonline.com/<tenant>/oauth2/v2.0/token
-DVSA_SCOPE=https://tapi.dvsa.gov.uk/.default
-DVSA_VEHICLE_API_URL=https://history.mot.api.gov.uk/v1/trade/vehicles/registration
+VEHICLE_DATA_DRIVER=demo
 ```
 
-Never commit production credentials or your local `.env` file.
+### UK government provider
 
-The application degrades gracefully when DVSA is not configured; local/demo vehicle records continue to work.
+Set the driver to `government` and supply your own credentials:
 
----
+```env
+VEHICLE_DATA_DRIVER=government
+DVLA_VES_API_KEY=
+DVLA_VES_URL=https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles
+DVSA_MOT_API_KEY=
+DVSA_MOT_CLIENT_ID=
+DVSA_MOT_CLIENT_SECRET=
+DVSA_MOT_TOKEN_URL=
+DVSA_MOT_SCOPE=https://tapi.dvsa.gov.uk/.default
+```
 
-## Background jobs
+The provider combines vehicle data with MOT history, normalises upstream responses, caches the DVSA access token and converts upstream failures into safe user-facing errors.
 
-`app:send-reminders` checks due reminders and dispatches notifications.
+## Architecture
 
-The command is scheduled daily. In production, run Laravel's scheduler and at least one queue worker. The included Docker Compose file provides both processes.
+```mermaid
+flowchart LR
+    B[Browser / PWA] --> L[Laravel web application]
+    L --> DB[(SQLite / production SQL DB)]
+    L --> FS[Private document storage]
+    L --> VP[VehicleDataProvider]
+    VP --> DEMO[Deterministic demo provider]
+    VP --> GOV[DVLA + DVSA provider]
+    L --> Q[(Database queue)]
+    W[Queue worker] --> Q
+    W --> N[Database / email notifications]
+    S[Laravel scheduler] --> R[Reminder command]
+    R --> Q
+```
 
-Recurring reminders advance their due date after completion:
+The project uses Laravel policies and form requests at the HTTP boundary, action/service classes for domain workflows, Eloquent models for persistence, Blade/Tailwind for the UI and queued notifications for background work.
 
-- monthly → +1 month
-- quarterly → +3 months
-- yearly → +1 year
+See [architecture notes](docs/architecture.md) for a deeper walkthrough.
 
-A mileage-only recurring reminder cannot infer the next mileage threshold automatically, so it is completed as a one-off until the owner chooses a new target.
+## Testing and quality gates
 
----
+The project includes feature and unit coverage for:
 
-## Data and privacy model
+- registration, login, logout, verification and password reset;
+- vehicle creation and cross-user data isolation;
+- owner/manager/viewer permissions;
+- maintenance completion and health recalculation;
+- reminder notification windows and recurring reminders;
+- private document storage and authorisation;
+- public-passport privacy boundaries;
+- events and vehicle attendance permissions;
+- specialist booking lifecycle;
+- admin event/specialist CRUD and booking operations;
+- community posting permissions;
+- government vehicle-data normalisation and failure handling;
+- admin-only access.
 
-That Car App intentionally separates private ownership data from public/community data.
+Run locally:
 
-- Vehicle documents are stored on Laravel's **private local disk**, not the public web disk.
-- Document downloads go through an authenticated, policy-authorized controller.
-- Public garage payloads expose a curated vehicle subset rather than serializing complete vehicle models.
-- Vehicle update/delete/manage actions are enforced with policies.
-- Shared access is split into `viewer` and `manager` roles.
-- Administrative routes require the admin role.
-- Source control excludes `.env`, databases, sessions, caches, logs, uploaded files and generated frontend assets.
+```bash
+php artisan test --compact
+vendor/bin/pint --test
+npm run build
+```
 
-See [Security](docs/SECURITY.md) for the portfolio security model and deployment checklist.
+GitHub Actions runs PHP tests/style checks, the Vite production build, and a Docker image build on pushes and pull requests.
 
----
+## Privacy and security choices
+
+- `.env` files, SQLite databases, sessions, caches and uploaded documents are ignored by Git.
+- Uploaded vehicle documents use Laravel's private local disk rather than `public/`.
+- Public vehicle passports intentionally exclude the full registration and private document metadata.
+- Vehicle operations are protected by Laravel policies with owner, manager and viewer roles.
+- Login attempts are rate limited.
+- Live vehicle-service credentials are environment-only.
+- Queued work and scheduled reminders run separately from the request lifecycle.
+
+## Production deployment
+
+The included Docker image installs development dependencies because the local demo seeder uses Faker-backed factories. It is a reviewer/demo image, not a hardened production image. For production, use a separate `--no-dev` build, disable demo seeding and provision real accounts securely.
+
+The included Docker Compose file is optimised for a local/demo install. For a public production deployment, use a persistent production database (for example PostgreSQL/MySQL), durable private file/object storage, a unique `APP_KEY`, a real mail transport, HTTPS, a queue worker and a scheduler process.
+
+See [deployment notes](docs/deployment.md).
 
 ## Repository structure
 
 ```text
 app/
-  Console/Commands/      scheduled reminder command
-  Http/Controllers/      web, community, booking and admin controllers
-  Models/                application domain models
-  Notifications/         queued reminder notification
-  Policies/              vehicle authorization
-bootstrap/
-config/
+  Actions/          Domain workflows
+  Contracts/        Vehicle-data abstraction
+  Http/             Controllers + validated requests
+  Models/           Eloquent domain models
+  Notifications/    Queued notifications
+  Policies/         Authorisation rules
+  Services/         Vehicle data + health logic
 database/
   factories/
   migrations/
-  seeders/               repeatable demo data
+  seeders/
 resources/
   css/
   js/
   views/
-routes/
-storage/                 runtime directories only; user data ignored by Git
-
+public/              PWA assets + web entrypoint
 tests/
-  Feature/               end-to-end Laravel feature coverage
+  Feature/
   Unit/
+docker/              Container entrypoint
+docs/                Architecture + deployment notes
 ```
-
-Additional engineering documentation:
-
-- [Architecture](docs/ARCHITECTURE.md)
-- [Deployment](docs/DEPLOYMENT.md)
-- [Security](docs/SECURITY.md)
-
----
-
-## CI/CD
-
-`.github/workflows/ci.yml` validates each push and pull request with:
-
-1. Composer dependency installation
-2. Laravel Pint style checks
-3. application bootstrap/route validation
-4. Blade template compilation
-5. PHPUnit
-6. npm clean install
-7. production Vite build
-8. Docker Compose configuration and image build
-
-Dependabot is configured for Composer, npm and GitHub Actions dependency updates.
-
----
-
-## Production notes
-
-The Docker Compose configuration is optimized for a self-contained demo/reviewer experience. For a real production deployment you should additionally use:
-
-- a managed database rather than container-local SQLite;
-- a production mail provider;
-- durable/private object storage for documents;
-- HTTPS and secure cookies;
-- queue monitoring/restarts;
-- centralized logs/error reporting;
-- application and database backups;
-- secret management provided by the deployment platform.
-
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
----
-
-## Why this project exists
-
-That Car App demonstrates a larger Laravel product rather than a single CRUD exercise. The application includes:
-
-- a non-trivial relational domain model;
-- resource ownership and shared-access authorization;
-- private document handling;
-- background queues and scheduled work;
-- third-party API integration;
-- recurring domain workflows;
-- social/community relationships;
-- marketplace-style booking flows;
-- operational admin tooling;
-- automated feature testing;
-- reproducible development and container environments.
-
-It complements [Overtakr](https://github.com/Adel-Mtr/overtakr), a Next.js/TypeScript + FastAPI/Python motorsport analytics project.
-
----
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
