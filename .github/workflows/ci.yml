@@ -75,3 +75,30 @@ jobs:
       - name: Stop test containers
         if: always()
         run: docker compose down -v
+
+  render-demo:
+    runs-on: ubuntu-latest
+    needs: [php, frontend]
+    steps:
+      - uses: actions/checkout@v6
+      - run: docker build -f docker/Render.Dockerfile -t that-car-app-render .
+      - name: Verify Apache demo startup and access restrictions
+        run: |
+          docker run -d --name render-demo -p 10000:10000 \
+            -e APP_ENV=production -e APP_DEBUG=false -e PORTFOLIO_DEMO=true \
+            -e DB_CONNECTION=sqlite -e DB_DATABASE=/data/database.sqlite \
+            -e RUN_MIGRATIONS=true -e SEED_DEMO=true \
+            -e SESSION_DRIVER=database -e CACHE_STORE=database \
+            -e QUEUE_CONNECTION=sync -e MAIL_MAILER=log \
+            -e VEHICLE_DATA_DRIVER=demo that-car-app-render
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:10000/up
+          curl --fail http://localhost:10000/login | tee /tmp/demo-login.html
+          python3 -c 'from pathlib import Path; assert "Portfolio demo" in Path("/tmp/demo-login.html").read_text()'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:10000/admin)" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:10000/.env)" = 404
+      - name: Show Apache demo logs
+        if: failure()
+        run: docker logs render-demo
+      - name: Stop Apache demo
+        if: always()
+        run: docker rm -f render-demo
