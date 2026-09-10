@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -48,7 +49,7 @@ class PortfolioDemoTest extends TestCase
     public function test_vehicle_changes_and_document_uploads_are_blocked(): void
     {
         $user = User::factory()->create();
-        $vehicle = \App\Models\Vehicle::factory()->create(['owner_id' => $user->id]);
+        $vehicle = Vehicle::factory()->create(['owner_id' => $user->id]);
         $this->actingAs($user)->delete('/vehicles/'.$vehicle->id)->assertForbidden();
         $this->post('/vehicles/'.$vehicle->id.'/documents', [
             'document' => UploadedFile::fake()->create('private.pdf', 10),
