@@ -86,6 +86,8 @@
             </div>
         </header>
 
+        <x-demo-notice />
+
         @if(session('success'))
             <div data-dismissible class="mx-4 mt-4 flex items-center gap-3 rounded-2xl border border-moss-600/15 bg-moss-100 px-4 py-3 text-sm text-moss-700 shadow-sm sm:mx-6 lg:mx-8">
                 <span class="grid size-7 place-items-center rounded-full bg-moss-600 text-white"><x-icon name="check" class="size-4" /></span>

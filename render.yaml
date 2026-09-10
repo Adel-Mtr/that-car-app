@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: adel-that-car-app-demo
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./docker/Render.Dockerfile
+    dockerContext: .
+    healthCheckPath: /up
+    autoDeployTrigger: "off"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: PORTFOLIO_DEMO
+        value: "true"
+      - key: PORT
+        value: "10000"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /data/database.sqlite
+      - key: RUN_MIGRATIONS
+        value: "true"
+      - key: SEED_DEMO
+        value: "true"
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: MAIL_MAILER
+        value: log
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: VEHICLE_DATA_DRIVER
+        value: demo

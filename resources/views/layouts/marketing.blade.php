@@ -30,6 +30,7 @@
         </div>
     </header>
 
+    <x-demo-notice />
     <main>{{ $slot ?? '' }}@yield('content')</main>
 
     <footer class="border-t border-ink-950/10 bg-ink-950 text-white">
