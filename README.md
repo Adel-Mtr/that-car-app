@@ -1,5 +1,7 @@
 # That Car App
 
+**[Open the live demo](https://adel-that-car-app-demo.onrender.com/)** · Read-only fictional data; free hosting may take a moment to wake up.
+
 [![CI](https://github.com/Adel-Mtr/that-car-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Adel-Mtr/that-car-app/actions/workflows/ci.yml)
 ![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)
@@ -29,7 +31,7 @@ The application works out of the box with deterministic demo vehicle data. It al
 - **Queued reminders:** background notifications and scheduling run separately from web requests.
 - **Reproducible local evaluation:** committed lockfiles, seed data and container smoke checks make setup failures visible in CI.
 
-The documented demo runs locally. No hosted demo is linked yet; public production deployment requires separate security and operational configuration.
+A read-only portfolio demo is hosted on Render. Public pages, health checks, HTTPS links and blocked admin access have been checked live. Member authentication and access restrictions are covered by CI; a live signed-in browser walkthrough remains to be completed. The full editable app is available locally. See [demo hosting details](docs/portfolio-launch.md).
 
 ## Product highlights
 
@@ -79,7 +81,7 @@ Email:    admin@thatcarapp.test
 Password: password
 ```
 
-These credentials only belong to seeded local demo data and must not be reused in a real deployment.
+The member account is also available in the read-only hosted demo. The admin account is local-only: hosted admin sign-in and routes are blocked. Never reuse these credentials for real accounts.
 
 If you register a new account in the Docker demo, email is intentionally sent to Laravel's log mailer. The queued verification message (including its local verification link) can be inspected with:
 
